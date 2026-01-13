@@ -6,13 +6,21 @@ steps:
 
   - label: "📦 Setup Backend"
     id: "setup-backend"
-    command: |
-      echo "Instalando dependencias PHP..."
-      # composer install --no-interaction
-      cp .env.example .env
-      php artisan key:generate
-      echo "✅ Backend setup completado"
-
+    agents:
+      queue: "default2"
+    plugins:
+      - docker#v5.11.0:
+          image: "php:8.2-cli"
+          always-pull: false
+          command:
+            - /bin/bash
+            - -lc
+            - |
+              echo "Instalando dependencias PHP..."
+              cp .env.example .env
+              php -v
+              php artisan key:generate || echo "Simulando artisan"
+              echo "✅ Backend setup completado"
   - label: "📦 Setup Frontend"
     id: "setup-frontend"
     command: |

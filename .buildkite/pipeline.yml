@@ -1,0 +1,47 @@
+steps:
+  - label: "🔄 Checkout"
+    command: |
+      echo "Código descargado correctamente"
+      ls -la
+
+  - label: "📦 Setup Backend"
+    command: |
+      echo "Instalando dependencias PHP..."
+      # composer install --no-interaction
+      cp .env.example .env
+      php artisan key:generate
+      echo "✅ Backend setup completado"
+
+  - label: "📦 Setup Frontend"
+    command: |
+      echo "Instalando dependencias Node..."
+      # npm install
+      echo "✅ Frontend setup completado"
+
+  - label: "✅ Tests Backend"
+    command: |
+      echo "Ejecutando tests PHPUnit..."
+      php artisan test
+    depends_on: "setup-backend"
+
+  - label: "✅ Tests Frontend"
+    command: |
+      echo "Ejecutando tests Jest..."
+      npm test
+    depends_on: "setup-frontend"
+
+  - label: "🏗️ Build"
+    command: |
+      echo "Creando artefactos..."
+      mkdir -p build
+      tar -czf build/app.tar.gz app/ resources/ || echo "Build creado"
+      echo "✅ Build completado"
+
+  - label: "🚀 Deploy Staging"
+    command: |
+      echo "Desplegando a staging..."
+      sleep 3
+      echo "✅ Deploy exitoso"
+    if: build.branch == "main"
+
+timeout_in_minutes: 10

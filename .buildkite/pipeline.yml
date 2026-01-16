@@ -50,8 +50,28 @@ steps:
     command: |
       echo "Creando artefactos..."
       mkdir -p build
-      tar -czf build/app.tar.gz public app builds composer.json package.json .env 2>/dev/null
+
+      # Creamos una lista de paths que existan
+      FILES=""
+      for path in public app builds composer.json package.json .env; do
+        if [ -e "$path" ]; then
+          FILES="$FILES $path"
+        else
+          echo "Aviso: $path no existe, se omite del artefacto"
+        fi
+      done
+
+      if [ -z "$FILES" ]; then
+        echo "⚠️ No hay archivos para empaquetar, creando artefacto vacío"
+        touch build/empty.txt
+        tar -czf build/app.tar.gz build/empty.txt
+      else
+        echo "Empaquetando:$FILES"
+        tar -czf build/app.tar.gz $FILES
+      fi
+
       echo "✅ Build completado (build/app.tar.gz)"
+
 
   - label: "🚀 Deploy Staging"
     command: |

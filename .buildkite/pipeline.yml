@@ -50,28 +50,10 @@ steps:
     command: |
       echo "Creando artefactos..."
       mkdir -p build
-
-      # Creamos una lista de paths que existan
-      FILES=""
-      for path in public app builds composer.json package.json .env; do
-        if [ -e "$path" ]; then
-          FILES="$FILES $path"
-        else
-          echo "Aviso: $path no existe, se omite del artefacto"
-        fi
-      done
-
-      if [ -z "$FILES" ]; then
-        echo "⚠️ No hay archivos para empaquetar, creando artefacto vacío"
-        touch build/empty.txt
-        tar -czf build/app.tar.gz build/empty.txt
-      else
-        echo "Empaquetando:$FILES"
-        tar -czf build/app.tar.gz $FILES
-      fi
-
+      tar -czf build/app.tar.gz app public resources tests composer.json package.json phpunit.xml .env.example
       echo "✅ Build completado (build/app.tar.gz)"
-
+    artifacts:
+      - "build/app.tar.gz"
 
   - label: "🚀 Deploy Staging"
     command: |

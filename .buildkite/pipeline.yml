@@ -6,46 +6,27 @@ steps:
 
   - label: "📦 Setup + Tests Backend"
     id: "backend"
-    agents:
-      queue: "default2"
-    plugins:
-      - docker#v5.11.0:
-          image: "php:8.2-cli"
-          always-pull: false
-          command:
-            - /bin/bash
-            - -lc
-            - |
-              echo "Instalando dependencias PHP..."
-              cp .env.example .env
-              php -v
-              curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-              composer install --no-interaction --no-progress
-              echo "✅ Dependencias PHP instaladas"
-              echo "Ejecutando tests PHPUnit..."
-              php artisan test
-              echo "✅ Tests backend completados"
+    command: |
+      echo "Instalando dependencias PHP..."
+      cp .env.example .env
+      php -v
+      composer install --no-interaction --no-progress
+      echo "✅ Dependencias PHP instaladas"
+      echo "Ejecutando tests PHPUnit..."
+      php artisan test
+      echo "✅ Tests backend completados"
 
   - label: "📦 Setup + Tests Frontend"
     id: "frontend"
-    agents:
-      queue: "default2"
-    plugins:
-      - docker#v5.11.0:
-          image: "node:18"
-          always-pull: false
-          command:
-            - /bin/bash
-            - -lc
-            - |
-              echo "Instalando dependencias Node..."
-              node -v
-              npm -v
-              npm install
-              echo "✅ Dependencias Node instaladas"
-              echo "Ejecutando tests Jest..."
-              npm test
-              echo "✅ Tests frontend completados"
+    command: |
+      echo "Instalando dependencias Node..."
+      node -v
+      npm -v
+      npm install
+      echo "✅ Dependencias Node instaladas"
+      echo "Ejecutando tests Jest..."
+      npm test
+      echo "✅ Tests frontend completados"
 
   - label: "🏗️ Build"
     depends_on:
@@ -54,7 +35,6 @@ steps:
     command: |
       echo "Creando artefactos..."
       mkdir -p build
-      # Incluimos backend y frontend build
       tar -czf build/app.tar.gz public app builds composer.json package.json .env 2>/dev/null
       echo "✅ Build completado (build/app.tar.gz)"
 

@@ -1,11 +1,18 @@
 {
-    "name": "pokemon-marketplace",
-    "version": "1.0.0",
-    "scripts": {
-        "build": "echo 'Building React app...'; sleep 2; echo '✅ Build completed';",
-        "test": "echo 'Running Jest tests...'; sleep 2; echo '✅ Tests passed (9/9)';"
-    },
-    "devDependencies": {
-        "react": "^18.0.0"
-    }
+  "name": "pokemon-marketplace",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo \"Building frontend...\" && mkdir -p ./builds && echo \"<h1>Buildkite Frontend OK</h1>\" | tee ./builds/index.html >/dev/null && echo \"✅ Build completed\"",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "react": "^18.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests"
+    ]
+  }
 }

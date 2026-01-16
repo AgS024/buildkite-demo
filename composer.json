@@ -1,19 +1,18 @@
 {
-    "name": "marketplace/pokemon",
-    "description": "Pokemon Trading Card Marketplace",
-    "require": {
-        "php": "^8.1",
-        "laravel/framework": "^10.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^10.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "app/"
-        }
-    },
-    "scripts": {
-        "test": "echo 'Running PHPUnit tests...'; sleep 2; echo '✅ Tests passed (8/8)';"
+  "name": "marketplace/pokemon",
+  "description": "Pokemon Trading Card Marketplace",
+  "require": {
+    "php": "^8.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
     }
+  },
+  "scripts": {
+    "test": "php artisan test"
+  }
 }

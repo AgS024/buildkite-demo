@@ -4,8 +4,8 @@ steps:
       echo "Código descargado correctamente"
       ls -la
 
-  - label: "📦 Setup Backend"
-    id: "setup-backend"
+  - label: "📦 Setup + Tests Backend"
+    id: "backend"
     agents:
       queue: "default2"
     plugins:
@@ -19,39 +19,50 @@ steps:
               echo "Instalando dependencias PHP..."
               cp .env.example .env
               php -v
-              php artisan key:generate || echo "Simulando artisan"
-              echo "✅ Backend setup completado"
-  - label: "📦 Setup Frontend"
-    id: "setup-frontend"
-    command: |
-      echo "Instalando dependencias Node..."
-      # npm install
-      echo "✅ Frontend setup completado"
+              curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+              composer install --no-interaction --no-progress
+              echo "✅ Dependencias PHP instaladas"
+              echo "Ejecutando tests PHPUnit..."
+              php artisan test
+              echo "✅ Tests backend completados"
 
-  - label: "✅ Tests Backend"
-    command: |
-      echo "Ejecutando tests PHPUnit..."
-      php artisan test || echo "⚠️ Tests backend fallaron"
-    depends_on: "setup-backend"
-
-  - label: "✅ Tests Frontend"
-    command: |
-      echo "Ejecutando tests Jest..."
-      npm test -- --passWithNoTests || echo "⚠️ Tests frontend fallaron"
-    depends_on: "setup-frontend"
+  - label: "📦 Setup + Tests Frontend"
+    id: "frontend"
+    agents:
+      queue: "default2"
+    plugins:
+      - docker#v5.11.0:
+          image: "node:18"
+          always-pull: false
+          command:
+            - /bin/bash
+            - -lc
+            - |
+              echo "Instalando dependencias Node..."
+              node -v
+              npm -v
+              npm install
+              echo "✅ Dependencias Node instaladas"
+              echo "Ejecutando tests Jest..."
+              npm test
+              echo "✅ Tests frontend completados"
 
   - label: "🏗️ Build"
+    depends_on:
+      - "backend"
+      - "frontend"
     command: |
       echo "Creando artefactos..."
       mkdir -p build
-      tar -czf build/app.tar.gz .env composer.json 2>/dev/null || echo "Artifact created"
-      echo "✅ Build completado"
+      # Incluimos backend y frontend build
+      tar -czf build/app.tar.gz public app builds composer.json package.json .env 2>/dev/null
+      echo "✅ Build completado (build/app.tar.gz)"
 
   - label: "🚀 Deploy Staging"
     command: |
-      echo "Desplegando a staging..."
+      echo "Desplegando a staging (simulado)..."
       sleep 3
       echo "✅ Deploy exitoso"
     if: build.branch == "main"
 
-timeout_in_minutes: 10
+timeout_in_minutes: 15
